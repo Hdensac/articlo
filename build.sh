@@ -5,6 +5,10 @@ set -o errexit  # Exit on error
 
 echo "🚀 Début du build Articlo..."
 
+# Mettre à jour pip
+echo "🔧 Mise à jour de pip..."
+python -m pip install --upgrade pip
+
 # Installer les dépendances Python
 echo "📦 Installation des dépendances Python..."
 pip install -r requirements.txt

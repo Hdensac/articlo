@@ -1,28 +1,18 @@
 # Django et extensions principales
-Django==4.2.7
-django-crispy-forms==2.1
-crispy-bootstrap5==0.7
+Django>=4.2,<5.0
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.7
 
 # Base de données PostgreSQL pour production
-psycopg2-binary==2.9.9
+psycopg2-binary>=2.9
 
 # Gestion des fichiers statiques et médias
-whitenoise==6.6.0
-Pillow==10.1.0
+whitenoise>=6.0
+Pillow>=10.0
 
 # Variables d'environnement
-python-decouple==3.8
-dj-database-url==2.1.0
+python-decouple>=3.8
+dj-database-url>=2.0
 
 # Serveur WSGI pour production
-gunicorn==21.2.0
-
-# Utilitaires
-pytz==2023.3
-sqlparse==0.4.4
-
-# Sécurité et CORS
-django-cors-headers==4.3.1
-
-# Outils de développement (optionnels en production)
-django-extensions==3.2.3
+gunicorn>=21.0
