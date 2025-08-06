@@ -1,0 +1,81 @@
+services:
+  # Service Web Django
+  - type: web
+    name: articlo-web
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    plan: free
+    healthCheckPath: /
+    envVars:
+      # Django Configuration
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      
+      # Security
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      
+      # Database (PostgreSQL sera automatiquement configuré)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: articlo-db
+          property: connectionString
+      
+      # Allowed Hosts (sera mis à jour avec votre domaine Render)
+      - key: ALLOWED_HOSTS
+        value: "127.0.0.1,localhost,.onrender.com"
+      
+      # Static Files
+      - key: STATIC_URL
+        value: "/static/"
+      - key: STATIC_ROOT
+        value: "staticfiles"
+      
+      # Media Files
+      - key: MEDIA_URL
+        value: "/media/"
+      - key: MEDIA_ROOT
+        value: "media"
+      
+      # Email Configuration (optionnel - à configurer plus tard)
+      - key: EMAIL_BACKEND
+        value: "django.core.mail.backends.console.EmailBackend"
+      
+      # Superuser Creation
+      - key: CREATE_SUPERUSER
+        value: True
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@articlo.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        generateValue: true
+      
+      # Test Data Creation
+      - key: CREATE_TEST_DATA
+        value: True
+      
+      # Time Zone
+      - key: TZ
+        value: Europe/Paris
+
+  # Base de données PostgreSQL
+  - type: pserv
+    name: articlo-db
+    env: postgresql
+    plan: free
+    databaseName: articlo
+    databaseUser: articlo_user
+    ipAllowList: []  # Permet l'accès depuis n'importe où (nécessaire pour Render)
+
+# Configuration des domaines personnalisés (optionnel)
+# domains:
+#   - name: articlo.com
+#     type: apex
+#   - name: www.articlo.com
+#     type: www
