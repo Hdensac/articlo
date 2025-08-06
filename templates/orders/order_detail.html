@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Informations de la commande -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-receipt"></i>
+                        Commande #{{ order.id }}
+                    </h4>
+                    <p class="mb-0 mt-2">Reçue le {{ order.created_at|date:"d/m/Y à H:i" }}</p>
+                </div>
+                <div class="card-body">
+                    <!-- Article commandé -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6><i class="fas fa-box text-primary"></i> Article commandé</h6>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% if order.article.images %}
+                                        <div class="col-md-3">
+                                            <img src="{{ order.article.images.url }}" alt="{{ order.article.title }}" 
+                                                 class="img-fluid rounded">
+                                        </div>
+                                        <div class="col-md-9">
+                                        {% else %}
+                                        <div class="col-12">
+                                        {% endif %}
+                                            <h6 class="card-title">{{ order.article.title }}</h6>
+                                            <p class="card-text">{{ order.article.description|truncatewords:20 }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="h5 text-success mb-0">{{ order.article.price }} €</span>
+                                                <a href="{% url 'articles:detail' order.article.id %}" 
+                                                   class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-eye"></i> Voir l'article
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations client -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6><i class="fas fa-user text-info"></i> Informations du client</h6>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-2">
+                                                <i class="fas fa-user"></i>
+                                                <strong>Nom :</strong> {{ order.client_name }}
+                                            </p>
+                                            <p class="mb-2">
+                                                <i class="fas fa-phone"></i>
+                                                <strong>Téléphone :</strong> 
+                                                <a href="tel:{{ order.client_phone }}" class="text-decoration-none">
+                                                    {{ order.client_phone }}
+                                                </a>
+                                            </p>
+                                            {% if order.client_email %}
+                                                <p class="mb-0">
+                                                    <i class="fas fa-envelope"></i>
+                                                    <strong>Email :</strong> 
+                                                    <a href="mailto:{{ order.client_email }}" class="text-decoration-none">
+                                                        {{ order.client_email }}
+                                                    </a>
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% if order.client_phone %}
+                                                <div class="d-grid gap-2">
+                                                    <a href="tel:{{ order.client_phone }}" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-phone"></i> Appeler
+                                                    </a>
+                                                    {% if order.client_phone|slice:":1" == "+" %}
+                                                        <a href="https://wa.me/{{ order.client_phone|slice:"1:" }}" 
+                                                           target="_blank" class="btn btn-success btn-sm">
+                                                            <i class="fab fa-whatsapp"></i> WhatsApp
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    {% if order.message %}
+                                        <hr>
+                                        <h6><i class="fas fa-comment text-warning"></i> Message du client</h6>
+                                        <div class="alert alert-light">
+                                            <p class="mb-0">{{ order.message }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions et statut -->
+        <div class="col-md-4">
+            <!-- Statut actuel -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-flag"></i>
+                        Statut de la commande
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {% if order.status == 'pending' %}
+                            <span class="badge bg-warning fs-6 p-2">
+                                <i class="fas fa-clock"></i> {{ order.get_status_display }}
+                            </span>
+                        {% elif order.status == 'confirmed' %}
+                            <span class="badge bg-success fs-6 p-2">
+                                <i class="fas fa-check"></i> {{ order.get_status_display }}
+                            </span>
+                        {% elif order.status == 'cancelled' %}
+                            <span class="badge bg-danger fs-6 p-2">
+                                <i class="fas fa-times"></i> {{ order.get_status_display }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Formulaire de changement de statut -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">
+                                Changer le statut :
+                            </label>
+                            {{ form.status }}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Mettre à jour
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Actions rapides -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt"></i>
+                        Actions rapides
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if order.client_phone %}
+                            <a href="tel:{{ order.client_phone }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-phone"></i> Appeler le client
+                            </a>
+                            {% if order.client_phone|slice:":1" == "+" %}
+                                <a href="https://wa.me/{{ order.client_phone|slice:"1:" }}" 
+                                   target="_blank" class="btn btn-success btn-sm">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        {% if order.client_email %}
+                            <a href="mailto:{{ order.client_email }}" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-envelope"></i> Envoyer un email
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'articles:detail' order.article.id %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-eye"></i> Voir l'article
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations -->
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Informations
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="small mb-2">
+                        <strong>Commande reçue :</strong><br>
+                        {{ order.created_at|date:"d/m/Y à H:i" }}
+                    </p>
+                    <p class="small mb-0">
+                        <strong>Dernière modification :</strong><br>
+                        {{ order.updated_at|date:"d/m/Y à H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'seller_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Retour au dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+    
+    .badge {
+        border-radius: 0.5rem;
+    }
+    
+    .btn-success {
+        background: linear-gradient(45deg, #25d366, #128c7e);
+        border: none;
+    }
+    
+    .btn-success:hover {
+        background: linear-gradient(45deg, #128c7e, #075e54);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Image de l'article -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                {% if article.images %}
+                    <img src="{{ article.images.url }}" alt="{{ article.title }}" 
+                         class="card-img-top" style="height: 400px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                         style="height: 400px;">
+                        <i class="fas fa-image text-muted" style="font-size: 5rem;"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Informations de l'article -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <!-- Titre et prix -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="h3 mb-0">{{ article.title }}</h1>
+                        <span class="badge bg-success fs-5 p-2">{{ article.price }} €</span>
+                    </div>
+
+                    <!-- Informations vendeur -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-store text-primary"></i>
+                                Vendu par
+                            </h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1"><strong>{{ article.seller.get_full_name|default:article.seller.username }}</strong></p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i>
+                                        Membre depuis {{ article.seller.date_joined|date:"M Y" }}
+                                    </small>
+                                </div>
+                                {% if article.whatsapp_link %}
+                                    <a href="{{ article.whatsapp_link }}" target="_blank" 
+                                       class="btn btn-success">
+                                        <i class="fab fa-whatsapp"></i>
+                                        Contacter
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h6><i class="fas fa-align-left text-primary"></i> Description</h6>
+                        <p class="text-muted">{{ article.description|linebreaks }}</p>
+                    </div>
+
+                    <!-- Informations supplémentaires -->
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i>
+                                Publié le {{ article.created_at|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted">
+                                <i class="fas fa-eye"></i>
+                                Article #{{ article.id }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        {% if article.whatsapp_link %}
+                            <a href="{{ article.whatsapp_link }}" target="_blank" 
+                               class="btn btn-success btn-lg">
+                                <i class="fab fa-whatsapp"></i>
+                                Commander via WhatsApp
+                            </a>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Le vendeur n'a pas configuré de numéro WhatsApp
+                            </div>
+                        {% endif %}
+                        
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Retour aux articles
+                        </a>
+                    </div>
+
+                    <!-- Actions vendeur -->
+                    {% if user.is_authenticated and user == article.seller %}
+                        <hr>
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-user-cog"></i> Actions vendeur</h6>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'articles:edit' article.id %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a href="{% url 'articles:delete' article.id %}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                                <a href="{% url 'seller_dashboard' %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles similaires (placeholder pour future fonctionnalité) -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4><i class="fas fa-tags text-primary"></i> Articles similaires</h4>
+            <div class="alert alert-light">
+                <i class="fas fa-info-circle"></i>
+                Cette fonctionnalité sera bientôt disponible pour vous proposer des articles similaires.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+    
+    .btn-success {
+        background: linear-gradient(45deg, #25d366, #128c7e);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+    
+    .badge {
+        border-radius: 0.5rem;
+    }
+    
+    .alert-info {
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .alert-warning {
+        border-left: 4px solid #ffc107;
+    }
+</style>
+{% endblock %}

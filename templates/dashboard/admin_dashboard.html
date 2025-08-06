@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-crown text-warning"></i>
+                        Dashboard Administrateur
+                    </h1>
+                    <p class="text-muted">Vue d'ensemble de la plateforme Articlo</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'admin_stats' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-bar"></i>
+                        Statistiques détaillées
+                    </a>
+                    <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-cog"></i>
+                        Admin Django
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Utilisateurs totaux
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_users }}</div>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i>
+                                +{{ stats.new_users_30d }} ce mois
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Articles publiés
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_articles }}</div>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i>
+                                +{{ stats.new_articles_30d }} ce mois
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Commandes totales
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_orders }}</div>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i>
+                                +{{ stats.new_orders_30d }} ce mois
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Notifications non lues
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.unread_notifications }}</div>
+                            <small class="text-info">
+                                <a href="{% url 'admin_notifications' %}">Voir toutes</a>
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bell fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Répartition des utilisateurs et commandes -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-users"></i>
+                        Répartition des utilisateurs
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <div class="h4 text-danger">{{ stats.total_sellers }}</div>
+                            <small class="text-muted">Vendeurs</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="h4 text-primary">{{ stats.total_clients }}</div>
+                            <small class="text-muted">Clients</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="h4 text-warning">{{ stats.total_users|add:"-"|add:stats.total_sellers|add:"-"|add:stats.total_clients }}</div>
+                            <small class="text-muted">Autres</small>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'admin_users' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-users"></i>
+                            Gérer les utilisateurs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-pie"></i>
+                        Statut des commandes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <div class="h4 text-warning">{{ stats.orders_pending }}</div>
+                            <small class="text-muted">En attente</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="h4 text-success">{{ stats.orders_confirmed }}</div>
+                            <small class="text-muted">Confirmées</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="h4 text-danger">{{ stats.orders_cancelled }}</div>
+                            <small class="text-muted">Annulées</small>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'admin_orders' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-shopping-cart"></i>
+                            Gérer les commandes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation rapide -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Actions rapides
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_users' %}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <br>Gérer les utilisateurs
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_articles' %}" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-box fa-2x mb-2"></i>
+                                <br>Gérer les articles
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_orders' %}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                                <br>Gérer les commandes
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_notifications' %}" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-bell fa-2x mb-2"></i>
+                                <br>Notifications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top vendeurs et activité récente -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-trophy"></i>
+                        Top vendeurs
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% for seller in top_sellers %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ seller.get_full_name|default:seller.username }}</strong>
+                                <br>
+                                <small class="text-muted">{{ seller.email }}</small>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge bg-primary">{{ seller.articles_count }} article{{ seller.articles_count|pluralize }}</span>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                    {% empty %}
+                        <p class="text-muted">Aucun vendeur pour le moment.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-clock"></i>
+                        Activité récente
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-muted">Articles récents</h6>
+                    {% for article in recent_articles %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ article.title|truncatechars:30 }}</strong>
+                                <br>
+                                <small class="text-muted">par {{ article.seller.username }}</small>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-success">{{ article.price }}€</span>
+                                <br>
+                                <small class="text-muted">{{ article.created_at|date:"d/m H:i" }}</small>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">Aucun article récent.</p>
+                    {% endfor %}
+
+                    <hr>
+
+                    <h6 class="text-muted">Commandes récentes</h6>
+                    {% for order in recent_orders %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ order.client_name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ order.article.title|truncatechars:25 }}</small>
+                            </div>
+                            <div class="text-right">
+                                {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% elif order.status == 'confirmed' %}
+                                    <span class="badge bg-success">Confirmée</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Annulée</span>
+                                {% endif %}
+                                <br>
+                                <small class="text-muted">{{ order.created_at|date:"d/m H:i" }}</small>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">Aucune commande récente.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .btn-block {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        height: auto;
+    }
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    }
+</style>
+{% endblock %}

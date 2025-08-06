@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Informations de l'article -->
+        <div class="col-md-5">
+            <div class="card shadow sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shopping-cart"></i>
+                        Article à commander
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if article.images %}
+                        <img src="{{ article.images.url }}" alt="{{ article.title }}" 
+                             class="img-fluid rounded mb-3" style="max-height: 200px; width: 100%; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" 
+                             style="height: 200px;">
+                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <p class="card-text">{{ article.description|truncatewords:20 }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="h4 text-success mb-0">{{ article.price }} €</span>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar"></i>
+                            {{ article.created_at|date:"d/m/Y" }}
+                        </small>
+                    </div>
+                    
+                    <!-- Informations vendeur -->
+                    <div class="border-top pt-3">
+                        <h6><i class="fas fa-store text-primary"></i> Vendeur</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1"><strong>{{ article.seller.get_full_name|default:article.seller.username }}</strong></p>
+                                <small class="text-muted">Membre depuis {{ article.seller.date_joined|date:"M Y" }}</small>
+                            </div>
+                            {% if article.whatsapp_link %}
+                                <a href="{{ article.whatsapp_link }}" target="_blank" 
+                                   class="btn btn-success btn-sm">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire de commande -->
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-alt"></i>
+                        Passer commande
+                    </h4>
+                    <p class="mb-0 mt-2">Remplissez vos informations pour commander cet article</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Nom complet -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.client_name.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-user text-primary"></i>
+                                {{ form.client_name.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.client_name }}
+                            {% if form.client_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.client_name.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.client_name.help_text }}</small>
+                        </div>
+
+                        <!-- Téléphone -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.client_phone.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-phone text-success"></i>
+                                {{ form.client_phone.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.client_phone }}
+                            {% if form.client_phone.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.client_phone.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.client_phone.help_text }}</small>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.client_email.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-envelope text-info"></i>
+                                {{ form.client_email.label }}
+                            </label>
+                            {{ form.client_email }}
+                            {% if form.client_email.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.client_email.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.client_email.help_text }}</small>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.message.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-comment text-warning"></i>
+                                {{ form.message.label }}
+                            </label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.message.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.message.help_text }}</small>
+                        </div>
+
+                        <!-- Informations importantes -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Comment ça marche ?</h6>
+                            <ol class="mb-0">
+                                <li>Vous remplissez ce formulaire</li>
+                                <li>Le vendeur reçoit votre demande</li>
+                                <li>Il vous contacte directement pour finaliser</li>
+                                <li>Vous vous arrangez pour la livraison/paiement</li>
+                            </ol>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'articles:detail' article.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Retour à l'article
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-paper-plane"></i>
+                                Envoyer ma commande
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Alternatives -->
+            <div class="card shadow mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb text-warning"></i>
+                        Autres options
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        {% if article.whatsapp_link %}
+                        <div class="col-6">
+                            <a href="{{ article.whatsapp_link }}" target="_blank" 
+                               class="btn btn-outline-success btn-sm w-100">
+                                <i class="fab fa-whatsapp"></i>
+                                <br>Contact direct WhatsApp
+                            </a>
+                            <small class="text-muted d-block mt-1">Plus rapide</small>
+                        </div>
+                        {% endif %}
+                        <div class="col-6">
+                            <a href="{% url 'home' %}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-search"></i>
+                                <br>Voir d'autres articles
+                            </a>
+                            <small class="text-muted d-block mt-1">Continuer à parcourir</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    .btn-success {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+    
+    .alert-info {
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .sticky-top {
+        z-index: 1020;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validation en temps réel
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+    
+    // Formatage automatique du numéro de téléphone
+    const phoneInput = document.getElementById('{{ form.client_phone.id_for_label }}');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0 && !value.startsWith('0') && !value.startsWith('33')) {
+                value = '33' + value;
+            }
+            if (value.length > 0) {
+                value = '+' + value;
+            }
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

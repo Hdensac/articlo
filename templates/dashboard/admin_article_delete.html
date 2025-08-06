@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- En-tête -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Confirmer la suppression
+                    </h4>
+                    <p class="mb-0 mt-2">Action irréversible - Suppression d'article</p>
+                </div>
+            </div>
+
+            <!-- Informations de l'article -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-info"></i>
+                        Article à supprimer
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% if article.images %}
+                                <img src="{{ article.images.url }}" alt="{{ article.title }}" 
+                                     class="img-fluid rounded">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="height: 200px;">
+                                    <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h4 class="text-danger">{{ article.title }}</h4>
+                            <p class="text-muted">{{ article.description|truncatewords:30 }}</p>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <p><strong>Prix :</strong> <span class="text-success">{{ article.price }} €</span></p>
+                                    <p><strong>Créé le :</strong> {{ article.created_at|date:"d/m/Y à H:i" }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <p><strong>Vendeur :</strong> {{ article.seller.get_full_name|default:article.seller.username }}</p>
+                                    <p><strong>Email vendeur :</strong> {{ article.seller.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avertissement -->
+            <div class="alert alert-danger">
+                <h5><i class="fas fa-exclamation-triangle"></i> Attention !</h5>
+                <ul class="mb-0">
+                    <li>Cette action est <strong>irréversible</strong></li>
+                    <li>L'article sera définitivement supprimé de la base de données</li>
+                    <li>Les commandes liées à cet article seront conservées mais l'article ne sera plus accessible</li>
+                    <li>Le vendeur ne pourra plus gérer cet article</li>
+                </ul>
+            </div>
+
+            <!-- Confirmation -->
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-circle text-success"></i>
+                        Confirmation de suppression
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous absolument certain de vouloir supprimer cet article ?</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'admin_articles' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Annuler et retourner à la liste
+                        </a>
+                        
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-lg" 
+                                    onclick="return confirm('DERNIÈRE CHANCE : Êtes-vous sûr de vouloir supprimer définitivement cet article ?')">
+                                <i class="fas fa-trash"></i>
+                                Supprimer définitivement
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations supplémentaires -->
+            <div class="card shadow mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info"></i>
+                        Informations supplémentaires
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Statistiques de l'article</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-calendar text-primary"></i> Créé il y a {{ article.created_at|timesince }}</li>
+                                <li><i class="fas fa-edit text-info"></i> Modifié il y a {{ article.updated_at|timesince }}</li>
+                                <li><i class="fas fa-user text-warning"></i> Vendeur : {{ article.seller.username }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Actions alternatives</h6>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'articles:detail' article.id %}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                    Voir l'article sur le site
+                                </a>
+                                <a href="{% url 'admin_articles' %}?seller={{ article.seller.id }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-search"></i>
+                                    Voir tous les articles de ce vendeur
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    }
+    
+    .alert-danger {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(45deg, #dc3545, #c82333);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-danger:hover {
+        background: linear-gradient(45deg, #c82333, #a71e2a);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-chart-bar text-info"></i>
+                        Statistiques détaillées
+                    </h1>
+                    <p class="text-muted">Analyse complète de l'activité de la plateforme</p>
+                </div>
+                <div>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Retour au dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques par période -->
+    <div class="row mb-4">
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-users"></i>
+                        Utilisateurs
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-12 mb-3">
+                            <div class="h2 text-primary">{{ stats.users.total }}</div>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="h5 text-success">+{{ stats.users.week }}</div>
+                            <small class="text-muted">Cette semaine</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 text-info">+{{ stats.users.month }}</div>
+                            <small class="text-muted">Ce mois</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="h6 text-danger">{{ stats.users.by_role.admin }}</div>
+                            <small class="text-muted">Admin</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h6 text-warning">{{ stats.users.by_role.seller }}</div>
+                            <small class="text-muted">Vendeurs</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h6 text-primary">{{ stats.users.by_role.client }}</div>
+                            <small class="text-muted">Clients</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-box"></i>
+                        Articles
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-12 mb-3">
+                            <div class="h2 text-success">{{ stats.articles.total }}</div>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="h5 text-success">+{{ stats.articles.week }}</div>
+                            <small class="text-muted">Cette semaine</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 text-info">+{{ stats.articles.month }}</div>
+                            <small class="text-muted">Ce mois</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <a href="{% url 'admin_articles' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-eye"></i>
+                            Voir tous les articles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-shopping-cart"></i>
+                        Commandes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-12 mb-3">
+                            <div class="h2 text-info">{{ stats.orders.total }}</div>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="h5 text-success">+{{ stats.orders.week }}</div>
+                            <small class="text-muted">Cette semaine</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 text-info">+{{ stats.orders.month }}</div>
+                            <small class="text-muted">Ce mois</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="h6 text-warning">{{ stats.orders.by_status.pending }}</div>
+                            <small class="text-muted">Attente</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h6 text-success">{{ stats.orders.by_status.confirmed }}</div>
+                            <small class="text-muted">Confirmées</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h6 text-danger">{{ stats.orders.by_status.cancelled }}</div>
+                            <small class="text-muted">Annulées</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top vendeurs détaillé -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-trophy"></i>
+                        Top 10 vendeurs
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if top_sellers %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Rang</th>
+                                        <th>Vendeur</th>
+                                        <th>Email</th>
+                                        <th>Articles</th>
+                                        <th>Commandes reçues</th>
+                                        <th>Inscription</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for seller in top_sellers %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    {% if forloop.counter <= 3 %}
+                                                        <span class="badge bg-warning text-dark me-2">
+                                                            {% if forloop.counter == 1 %}🥇
+                                                            {% elif forloop.counter == 2 %}🥈
+                                                            {% else %}🥉
+                                                            {% endif %}
+                                                        </span>
+                                                    {% endif %}
+                                                    <strong>#{{ forloop.counter }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-3">
+                                                        {{ seller.first_name.0|default:seller.username.0|upper }}
+                                                    </div>
+                                                    <div>
+                                                        <strong>{{ seller.get_full_name|default:seller.username }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">@{{ seller.username }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ seller.email }}</td>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    {{ seller.articles_count }} article{{ seller.articles_count|pluralize }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    {{ seller.orders_count }} commande{{ seller.orders_count|pluralize }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {{ seller.date_joined|date:"d/m/Y" }}
+                                                <br>
+                                                <small class="text-muted">{{ seller.date_joined|timesince }} ago</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'admin_articles' %}?seller={{ seller.id }}" 
+                                                       class="btn btn-sm btn-outline-success" title="Voir ses articles">
+                                                        <i class="fas fa-box"></i>
+                                                    </a>
+                                                    <a href="{% url 'admin_orders' %}?seller={{ seller.id }}" 
+                                                       class="btn btn-sm btn-outline-info" title="Voir ses commandes">
+                                                        <i class="fas fa-shopping-cart"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-users text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3 text-muted">Aucun vendeur</h5>
+                            <p class="text-muted">Les statistiques des vendeurs apparaîtront ici.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-tools"></i>
+                        Actions rapides
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_users' %}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <br>Gérer les utilisateurs
+                                <br><small class="text-muted">{{ stats.users.total }} utilisateurs</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_articles' %}" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-box fa-2x mb-2"></i>
+                                <br>Gérer les articles
+                                <br><small class="text-muted">{{ stats.articles.total }} articles</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_orders' %}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                                <br>Gérer les commandes
+                                <br><small class="text-muted">{{ stats.orders.total }} commandes</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'admin_notifications' %}" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-bell fa-2x mb-2"></i>
+                                <br>Notifications
+                                <br><small class="text-muted">Voir toutes</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    }
+    
+    .btn-block {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        height: auto;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #5a5c69;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- En-tête -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit"></i>
+                        {{ page_title }}
+                    </h4>
+                    <p class="mb-0 mt-2">Modifiez les informations de votre article</p>
+                </div>
+            </div>
+
+            <!-- Formulaire -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Image actuelle -->
+                        {% if article.images %}
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-image text-info"></i>
+                                Image actuelle
+                            </label>
+                            <div class="border rounded p-3 text-center bg-light">
+                                <img src="{{ article.images.url }}" alt="{{ article.title }}" 
+                                     class="img-fluid rounded" style="max-height: 200px;">
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Titre -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-tag text-primary"></i>
+                                {{ form.title.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.title.help_text }}</small>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-align-left text-primary"></i>
+                                {{ form.description.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.description.help_text }}</small>
+                        </div>
+
+                        <!-- Prix et Nouvelle Image -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-4">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-euro-sign text-success"></i>
+                                        {{ form.price.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.price }}
+                                        <span class="input-group-text">€</span>
+                                    </div>
+                                    {% if form.price.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.price.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">{{ form.price.help_text }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-4">
+                                    <label for="{{ form.images.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-image text-info"></i>
+                                        Changer l'image
+                                    </label>
+                                    {{ form.images }}
+                                    {% if form.images.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.images.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">Laissez vide pour garder l'image actuelle</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aperçu de la nouvelle image -->
+                        <div class="form-group mb-4" id="image-preview" style="display: none;">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-eye text-info"></i>
+                                Aperçu de la nouvelle image
+                            </label>
+                            <div class="border rounded p-3 text-center">
+                                <img id="preview-img" src="" alt="Aperçu" class="img-fluid" style="max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <!-- Informations sur l'article -->
+                        <div class="alert alert-light border">
+                            <h6><i class="fas fa-info-circle text-info"></i> Informations sur l'article :</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Créé le :</strong> {{ article.created_at|date:"d/m/Y à H:i" }}</p>
+                                    <p class="mb-0"><strong>Vendeur :</strong> {{ article.seller.get_full_name|default:article.seller.username }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    {% if article.whatsapp_link %}
+                                        <p class="mb-1">
+                                            <strong>WhatsApp :</strong> 
+                                            <a href="{{ article.whatsapp_link }}" target="_blank" class="text-success">
+                                                <i class="fab fa-whatsapp"></i> Disponible
+                                            </a>
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'seller_dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Retour au dashboard
+                            </a>
+                            <div>
+                                <a href="{% url 'articles:delete' article.id %}" class="btn btn-outline-danger me-2">
+                                    <i class="fas fa-trash"></i>
+                                    Supprimer
+                                </a>
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-save"></i>
+                                    Enregistrer les modifications
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .form-control:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+    
+    .btn-warning {
+        background: linear-gradient(45deg, #ffc107, #e0a800);
+        border: none;
+        transition: all 0.3s ease;
+        color: #212529;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        color: #212529;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Aperçu de la nouvelle image
+    const imageInput = document.getElementById('{{ form.images.id_for_label }}');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        });
+    }
+    
+    // Validation en temps réel
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}

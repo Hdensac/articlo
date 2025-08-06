@@ -1,0 +1,640 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <!-- Hero Section Améliorée -->
+    <div class="hero-section bg-primary rounded-4 p-5 mb-5 position-relative overflow-hidden">
+        <div class="row align-items-center position-relative z-3">
+            <div class="col-lg-8 col-md-7">
+                <h1 class="display-4 fw-bold text-white mb-3">{{ page_title }}</h1>
+                <p class="lead text-white-75 mb-3">Découvrez une large sélection d'articles de qualité proposés par nos vendeurs de confiance.</p>
+                <p class="text-white-75">Contactez directement les vendeurs via WhatsApp pour passer commande !</p>
+                
+                <div class="mt-4">
+                    <div class="row text-white-75">
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <span>Articles vérifiés</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-shipping-fast me-2"></i>
+                                <span>Livraison rapide</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center">
+                                <i class="fab fa-whatsapp me-2"></i>
+                                <span>Contact direct</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-5 text-center">
+                <div class="hero-icon">
+                    <i class="fas fa-shopping-cart text-white" style="font-size: 6rem; opacity: 0.2;"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Décoration d'arrière-plan -->
+        <div class="position-absolute top-0 end-0 w-100 h-100">
+            <div class="bg-pattern"></div>
+        </div>
+    </div>
+
+    <!-- Barre de recherche et filtres améliorée -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white border-0 py-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="fas fa-search text-primary"></i>
+                    </div>
+                    Rechercher et filtrer
+                    {% if has_filters %}
+                        <span class="badge bg-primary ms-3 rounded-pill">Filtres actifs</span>
+                    {% endif %}
+                </h5>
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#searchFilters">
+                    <i class="fas fa-sliders-h me-1"></i>
+                    Filtres avancés
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <form method="get" class="search-form">
+                <!-- Recherche principale -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            {{ form.search }}
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-search me-1"></i>
+                                Rechercher
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary w-100 h-100 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-times me-2"></i>
+                            Effacer les filtres
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filtres avancés -->
+                <div class="collapse" id="searchFilters">
+                    <div class="border-top pt-4">
+                        <div class="row g-4">
+                            <!-- Vendeur -->
+                            <div class="col-lg-3 col-md-6">
+                                <label for="{{ form.seller.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="fas fa-user text-primary me-2"></i>{{ form.seller.label }}
+                                </label>
+                                {{ form.seller }}
+                            </div>
+
+                            <!-- Tri -->
+                            <div class="col-lg-3 col-md-6">
+                                <label for="{{ form.sort_by.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="fas fa-sort text-primary me-2"></i>{{ form.sort_by.label }}
+                                </label>
+                                {{ form.sort_by }}
+                            </div>
+
+                            <!-- Gamme de prix -->
+                            <div class="col-lg-3 col-md-6">
+                                <label for="{{ form.price_range.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="fas fa-euro-sign text-primary me-2"></i>{{ form.price_range.label }}
+                                </label>
+                                {{ form.price_range }}
+                            </div>
+
+                            <!-- Prix personnalisé -->
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-calculator text-primary me-2"></i>Prix personnalisé
+                                </label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        {{ form.min_price }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ form.max_price }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Résultats de recherche -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="h3 mb-2 d-flex align-items-center">
+                <div class="icon-wrapper me-3">
+                    <i class="fas fa-star text-warning"></i>
+                </div>
+                {% if has_filters %}
+                    Résultats de recherche
+                {% else %}
+                    Articles disponibles
+                {% endif %}
+                <span class="badge bg-primary ms-3 rounded-pill">
+                    {{ total_articles }} article{{ total_articles|pluralize }}
+                </span>
+            </h2>
+            {% if page_obj.paginator.num_pages > 1 %}
+                <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                </p>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary btn-sm active">
+                    <i class="fas fa-th-large me-1"></i>
+                    Grille
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-list me-1"></i>
+                    Liste
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {% if articles %}
+        <!-- Grille d'Articles Améliorée -->
+        <div class="row g-4">
+            {% for article in articles %}
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                    <div class="card article-card h-100 border-0 shadow-sm hover-lift">
+                        <!-- Image avec overlay -->
+                        <div class="card-img-wrapper position-relative">
+                            {% if article.images %}
+                                <img src="{{ article.images.url }}" 
+                                     class="card-img-top" 
+                                     alt="{{ article.title }}" 
+                                     style="height: 220px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 220px;">
+                                    <div class="text-center">
+                                        <i class="fas fa-image text-muted mb-2" style="font-size: 2.5rem;"></i>
+                                        <p class="text-muted small mb-0">Aucune image</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Badge Prix -->
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-dark bg-opacity-75 rounded-pill px-3 py-2 fw-bold">
+                                    {{ article.price }} €
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column p-4">
+                            <!-- Titre -->
+                            <h5 class="card-title mb-3">
+                                <a href="{% url 'articles:detail' article.id %}" 
+                                   class="text-decoration-none text-dark stretched-link-parent">
+                                    {{ article.title }}
+                                </a>
+                            </h5>
+                            
+                            <!-- Description -->
+                            <p class="card-text text-muted flex-grow-1 small lh-base">
+                                {{ article.description|truncatewords:15 }}
+                            </p>
+                            
+                            <!-- Métadonnées -->
+                            <div class="article-meta mb-3">
+                                <div class="row g-2 small text-muted">
+                                    <div class="col-6">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ article.seller.username }}
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ article.created_at|date:"d/m/Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="mt-auto">
+                                <div class="d-grid gap-2">
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'articles:detail' article.id %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Voir
+                                        </a>
+                                        <a href="{% url 'orders:order_article' article.id %}"
+                                           class="btn btn-primary btn-sm flex-fill">
+                                            <i class="fas fa-shopping-cart me-1"></i>
+                                            Commander
+                                        </a>
+                                    </div>
+                                    
+                                    {% if article.whatsapp_link %}
+                                        <a href="{{ article.whatsapp_link }}"
+                                           target="_blank"
+                                           class="btn btn-success btn-sm whatsapp-btn">
+                                            <i class="fab fa-whatsapp me-1"></i>
+                                            Contacter sur WhatsApp
+                                        </a>
+                                    {% else %}
+                                        <div class="text-center py-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                WhatsApp non disponible
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination Améliorée -->
+        {% if page_obj.paginator.num_pages > 1 %}
+            <div class="row mt-5">
+                <div class="col-12">
+                    <nav aria-label="Navigation des pages">
+                        <ul class="pagination justify-content-center">
+                            <!-- Première page -->
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                                </li>
+                            {% endif %}
+
+                            <!-- Pages numérotées -->
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <!-- Dernière page -->
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
+        
+    {% else %}
+        <!-- État Vide Amélioré -->
+        <div class="row">
+            <div class="col-12">
+                <div class="empty-state text-center py-5">
+                    <div class="empty-icon mb-4">
+                        {% if has_filters %}
+                            <i class="fas fa-search-minus text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+                            <h3 class="h4 text-muted mb-3">Aucun résultat trouvé</h3>
+                            <p class="text-muted mb-4">Essayez de modifier vos critères de recherche ou effacez les filtres.</p>
+                            <a href="{% url 'home' %}" class="btn btn-primary">
+                                <i class="fas fa-times me-2"></i>
+                                Effacer les filtres
+                            </a>
+                        {% else %}
+                            <i class="fas fa-box-open text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+                            <h3 class="h4 text-muted mb-3">Aucun article disponible</h3>
+                            <p class="text-muted mb-4">Les articles apparaîtront ici dès qu'ils seront publiés par nos vendeurs.</p>
+                            
+                            {% if user.is_authenticated and user.role == 'seller' %}
+                                <a href="{% url 'seller_dashboard' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Publier votre premier article
+                                </a>
+                            {% else %}
+                                <div class="d-flex justify-content-center gap-3">
+                                    <a href="{% url 'users:register' %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-user-plus me-2"></i>
+                                        Devenir vendeur
+                                    </a>
+                                    <a href="#" class="btn btn-primary">
+                                        <i class="fas fa-bell me-2"></i>
+                                        Être notifié
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Call to Action pour Vendeurs Amélioré -->
+    {% if not user.is_authenticated or user.role != 'seller' %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-0 bg-gradient-light rounded-4 overflow-hidden">
+                    <div class="card-body p-5 position-relative">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8">
+                                <h4 class="h3 mb-3">
+                                    <i class="fas fa-store text-primary me-2"></i>
+                                    Vous êtes vendeur ?
+                                </h4>
+                                <p class="text-muted mb-4 lead">
+                                    Rejoignez notre plateforme et commencez à vendre vos articles dès aujourd'hui !
+                                </p>
+                                
+                                <div class="row text-muted mb-4">
+                                    <div class="col-md-4 mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Inscription gratuite
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Commission réduite
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Support 24/7
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex flex-wrap gap-3">
+                                    <a href="{% url 'users:register' %}" class="btn btn-outline-primary btn-lg">
+                                        <i class="fas fa-user-plus me-2"></i>
+                                        S'inscrire gratuitement
+                                    </a>
+                                    <a href="{% url 'users:login' %}" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-sign-in-alt me-2"></i>
+                                        Se connecter
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-center">
+                                <div class="seller-illustration">
+                                    <i class="fas fa-chart-line text-primary" style="font-size: 4rem; opacity: 0.6;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    /* Variables CSS pour cohérence */
+    :root {
+        --primary-color: #0d6efd;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --border-radius: 0.5rem;
+        --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        --transition: all 0.15s ease-in-out;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+        position: relative;
+    }
+
+    .bg-pattern {
+        background-image: 
+            radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+    }
+
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+
+    /* Icon Wrapper */
+    .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 193, 7, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Formulaire de recherche */
+    .search-form .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+    .search-form .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .input-group-lg .form-control {
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .input-group-text {
+        border: 2px solid #e9ecef;
+        border-right: none;
+    }
+
+    /* Article Cards */
+    .article-card {
+        transition: var(--transition);
+        border-radius: var(--border-radius) !important;
+    }
+
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-img-wrapper {
+        overflow: hidden;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .card-img-top {
+        transition: transform 0.3s ease;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .article-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    /* Buttons */
+    .whatsapp-btn {
+        background: var(--success-color);
+        border-color: var(--success-color);
+        transition: var(--transition);
+    }
+
+    .whatsapp-btn:hover {
+        background: #157347;
+        border-color: #146c43;
+        transform: translateY(-1px);
+    }
+
+    .btn {
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* CTA Section */
+    .bg-gradient-light {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    /* Article Meta */
+    .article-meta {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-top: 0.75rem;
+    }
+
+    /* Pagination */
+    .pagination .page-link {
+        border-radius: var(--border-radius);
+        margin: 0 2px;
+        border: 1px solid #dee2e6;
+        transition: var(--transition);
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .pagination .page-link:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Rounded */
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+
+    .rounded-pill {
+        border-radius: 50rem !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 2rem !important;
+        }
+        
+        .hero-section h1 {
+            font-size: 2rem !important;
+        }
+        
+        .container-fluid {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        .input-group-lg .form-control {
+            font-size: 1rem;
+        }
+    }
+
+    /* Custom Form Styling */
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .collapse .border-top {
+        border-color: #e9ecef !important;
+    }
+</style>
+{% endblock %}

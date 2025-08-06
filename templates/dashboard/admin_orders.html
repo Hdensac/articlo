@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shopping-cart text-info"></i>
+                        Gestion des commandes
+                    </h1>
+                    <p class="text-muted">Suivre et gérer toutes les commandes de la plateforme</p>
+                </div>
+                <div>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Retour au dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-filter"></i>
+                Filtres et recherche
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="search" class="form-label">Recherche</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search }}" placeholder="Client, téléphone, article...">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="status" class="form-label">Statut</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">Tous les statuts</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="seller" class="form-label">Vendeur</label>
+                    <select class="form-control" id="seller" name="seller">
+                        <option value="">Tous les vendeurs</option>
+                        {% for seller in sellers %}
+                            <option value="{{ seller.id }}" {% if seller_filter == seller.id|stringformat:"s" %}selected{% endif %}>
+                                {{ seller.get_full_name|default:seller.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Rechercher
+                        </button>
+                        <a href="{% url 'admin_orders' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-times"></i>
+                            Effacer
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Liste des commandes -->
+    <div class="card shadow">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list"></i>
+                Liste des commandes ({{ page_obj.paginator.count }} commande{{ page_obj.paginator.count|pluralize }})
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if orders %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Commande</th>
+                                <th>Client</th>
+                                <th>Article</th>
+                                <th>Vendeur</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>
+                                        <strong>#{{ order.id }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ order.created_at|date:"d/m/Y H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ order.client_name }}</strong>
+                                            <br>
+                                            <small class="text-success">
+                                                <i class="fas fa-phone"></i>
+                                                <a href="tel:{{ order.client_phone }}" class="text-decoration-none">
+                                                    {{ order.client_phone }}
+                                                </a>
+                                            </small>
+                                            {% if order.client_email %}
+                                                <br>
+                                                <small class="text-info">
+                                                    <i class="fas fa-envelope"></i>
+                                                    <a href="mailto:{{ order.client_email }}" class="text-decoration-none">
+                                                        {{ order.client_email|truncatechars:20 }}
+                                                    </a>
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if order.article.images %}
+                                                <img src="{{ order.article.images.url }}" alt="{{ order.article.title }}" 
+                                                     class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 0.25rem;">
+                                            {% else %}
+                                                <div class="bg-light me-2 d-flex align-items-center justify-content-center" 
+                                                     style="width: 40px; height: 40px; border-radius: 0.25rem;">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <strong>{{ order.article.title|truncatechars:25 }}</strong>
+                                                <br>
+                                                <span class="text-success">{{ order.article.price }}€</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle-sm me-2">
+                                                {{ order.seller.first_name.0|default:order.seller.username.0|upper }}
+                                            </div>
+                                            <div>
+                                                <strong>{{ order.seller.get_full_name|default:order.seller.username }}</strong>
+                                                <br>
+                                                <small class="text-muted">@{{ order.seller.username }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-clock"></i>
+                                                En attente
+                                            </span>
+                                        {% elif order.status == 'confirmed' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i>
+                                                Confirmée
+                                            </span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times"></i>
+                                                Annulée
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ order.created_at|date:"d/m/Y" }}
+                                        <br>
+                                        <small class="text-muted">{{ order.created_at|date:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'orders:detail' order.id %}" 
+                                               class="btn btn-sm btn-outline-info" title="Voir détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if order.client_phone %}
+                                                <a href="tel:{{ order.client_phone }}" 
+                                                   class="btn btn-sm btn-outline-success" title="Appeler">
+                                                    <i class="fas fa-phone"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if order.client_email %}
+                                                <a href="mailto:{{ order.client_email }}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Email">
+                                                    <i class="fas fa-envelope"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% if order.message %}
+                                    <tr class="table-light">
+                                        <td colspan="7">
+                                            <small class="text-muted">
+                                                <i class="fas fa-comment"></i>
+                                                <strong>Message :</strong> {{ order.message }}
+                                            </small>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.paginator.num_pages > 1 %}
+                    <nav aria-label="Navigation des pages" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+
+                    <div class="text-center text-muted">
+                        <small>
+                            Affichage de {{ page_obj.start_index }} à {{ page_obj.end_index }} 
+                            sur {{ page_obj.paginator.count }} commande{{ page_obj.paginator.count|pluralize }}
+                        </small>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-muted">Aucune commande trouvée</h5>
+                    <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .avatar-circle-sm {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #17a2b8, #138496);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #5a5c69;
+    }
+    
+    .table-light td {
+        background-color: #f8f9fc !important;
+    }
+</style>
+{% endblock %}

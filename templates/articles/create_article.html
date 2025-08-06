@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- En-tête -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle"></i>
+                        {{ page_title }}
+                    </h4>
+                    <p class="mb-0 mt-2">Ajoutez un nouvel article à votre boutique</p>
+                </div>
+            </div>
+
+            <!-- Formulaire -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Titre -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-tag text-primary"></i>
+                                {{ form.title.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.title.help_text }}</small>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-align-left text-primary"></i>
+                                {{ form.description.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">{{ form.description.help_text }}</small>
+                        </div>
+
+                        <!-- Prix et Image -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-4">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-euro-sign text-success"></i>
+                                        {{ form.price.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.price }}
+                                        <span class="input-group-text">€</span>
+                                    </div>
+                                    {% if form.price.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.price.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">{{ form.price.help_text }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-4">
+                                    <label for="{{ form.images.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-image text-info"></i>
+                                        {{ form.images.label }}
+                                    </label>
+                                    {{ form.images }}
+                                    {% if form.images.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.images.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">{{ form.images.help_text }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aperçu de l'image -->
+                        <div class="form-group mb-4" id="image-preview" style="display: none;">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-eye text-info"></i>
+                                Aperçu de l'image
+                            </label>
+                            <div class="border rounded p-3 text-center">
+                                <img id="preview-img" src="" alt="Aperçu" class="img-fluid" style="max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <!-- Informations importantes -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Conseils pour une bonne annonce :</h6>
+                            <ul class="mb-0">
+                                <li>Utilisez un titre clair et précis</li>
+                                <li>Décrivez l'état de l'article (neuf, bon état, etc.)</li>
+                                <li>Mentionnez les caractéristiques importantes</li>
+                                <li>Ajoutez une photo de qualité</li>
+                                <li>Fixez un prix juste et attractif</li>
+                            </ul>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'seller_dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Retour au dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i>
+                                Publier l'article
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    }
+    
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+    
+    .alert-info {
+        border-left: 4px solid #17a2b8;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Aperçu de l'image
+    const imageInput = document.getElementById('{{ form.images.id_for_label }}');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        });
+    }
+    
+    // Validation en temps réel
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}

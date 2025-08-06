@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Articlo{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-users text-primary"></i>
+                        Gestion des utilisateurs
+                    </h1>
+                    <p class="text-muted">Gérer les comptes utilisateurs de la plateforme</p>
+                </div>
+                <div>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Retour au dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-filter"></i>
+                Filtres et recherche
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="search" class="form-label">Recherche</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search }}" placeholder="Nom, email, username...">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="role" class="form-label">Rôle</label>
+                    <select class="form-control" id="role" name="role">
+                        <option value="">Tous les rôles</option>
+                        <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Administrateur</option>
+                        <option value="seller" {% if role_filter == 'seller' %}selected{% endif %}>Vendeur</option>
+                        <option value="client" {% if role_filter == 'client' %}selected{% endif %}>Client</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Rechercher
+                        </button>
+                        <a href="{% url 'admin_users' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-times"></i>
+                            Effacer
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Liste des utilisateurs -->
+    <div class="card shadow">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list"></i>
+                Liste des utilisateurs ({{ page_obj.paginator.count }} utilisateur{{ page_obj.paginator.count|pluralize }})
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if users %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Utilisateur</th>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Statut</th>
+                                <th>Inscription</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-3">
+                                                {{ user.first_name.0|default:user.username.0|upper }}
+                                            </div>
+                                            <div>
+                                                <strong>{{ user.get_full_name|default:user.username }}</strong>
+                                                <br>
+                                                <small class="text-muted">@{{ user.username }}</small>
+                                                {% if user.whatsapp_number %}
+                                                    <br>
+                                                    <small class="text-success">
+                                                        <i class="fab fa-whatsapp"></i>
+                                                        {{ user.whatsapp_number }}
+                                                    </small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.role == 'admin' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-crown"></i>
+                                                Administrateur
+                                            </span>
+                                        {% elif user.role == 'seller' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-store"></i>
+                                                Vendeur
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-user"></i>
+                                                Client
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i>
+                                                Actif
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-times"></i>
+                                                Inactif
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ user.date_joined|date:"d/m/Y" }}
+                                        <br>
+                                        <small class="text-muted">{{ user.date_joined|date:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <!-- Toggle Status -->
+                                            <form method="post" action="{% url 'admin_user_toggle_status' user.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                {% if user.is_active %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                                            title="Désactiver" onclick="return confirm('Désactiver cet utilisateur ?')">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-success" 
+                                                            title="Activer" onclick="return confirm('Activer cet utilisateur ?')">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </form>
+
+                                            <!-- Change Role -->
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                                                        data-bs-toggle="dropdown" title="Changer le rôle">
+                                                    <i class="fas fa-user-cog"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    {% if user.role != 'admin' %}
+                                                        <li>
+                                                            <form method="post" action="{% url 'admin_user_change_role' user.id %}">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="role" value="admin">
+                                                                <button type="submit" class="dropdown-item" 
+                                                                        onclick="return confirm('Promouvoir en administrateur ?')">
+                                                                    <i class="fas fa-crown text-danger"></i>
+                                                                    Administrateur
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    {% endif %}
+                                                    {% if user.role != 'seller' %}
+                                                        <li>
+                                                            <form method="post" action="{% url 'admin_user_change_role' user.id %}">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="role" value="seller">
+                                                                <button type="submit" class="dropdown-item" 
+                                                                        onclick="return confirm('Changer en vendeur ?')">
+                                                                    <i class="fas fa-store text-warning"></i>
+                                                                    Vendeur
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    {% endif %}
+                                                    {% if user.role != 'client' %}
+                                                        <li>
+                                                            <form method="post" action="{% url 'admin_user_change_role' user.id %}">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="role" value="client">
+                                                                <button type="submit" class="dropdown-item" 
+                                                                        onclick="return confirm('Changer en client ?')">
+                                                                    <i class="fas fa-user text-primary"></i>
+                                                                    Client
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.paginator.num_pages > 1 %}
+                    <nav aria-label="Navigation des pages" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+
+                    <div class="text-center text-muted">
+                        <small>
+                            Affichage de {{ page_obj.start_index }} à {{ page_obj.end_index }} 
+                            sur {{ page_obj.paginator.count }} utilisateur{{ page_obj.paginator.count|pluralize }}
+                        </small>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-muted">Aucun utilisateur trouvé</h5>
+                    <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #5a5c69;
+    }
+    
+    .btn-group .dropdown-menu {
+        min-width: 150px;
+    }
+    
+    .dropdown-item {
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8f9fc;
+    }
+</style>
+{% endblock %}
