@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Accès restreint - Articlo{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Accès restreint
+                    </h4>
+                </div>
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-store text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h5 class="card-title mb-3">Vous êtes connecté en tant que vendeur</h5>
+                    
+                    <p class="card-text text-muted mb-4">
+                        Les vendeurs ne peuvent pas passer de commandes sur la plateforme. 
+                        Votre rôle est de gérer vos articles et de traiter les commandes que vous recevez.
+                    </p>
+                    
+                    <div class="alert alert-info mb-4">
+                        <h6><i class="fas fa-lightbulb"></i> Ce que vous pouvez faire :</h6>
+                        <ul class="list-unstyled mb-0 text-start">
+                            <li><i class="fas fa-check text-success me-2"></i> Gérer vos articles (créer, modifier, supprimer)</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Consulter et traiter vos commandes</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Voir les notifications</li>
+                            <li><i class="fas fa-check text-success me-2"></i> Mettre à jour votre profil vendeur</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'seller_dashboard' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Aller au tableau de bord vendeur
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home"></i>
+                            Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border-radius: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .alert-info {
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .list-unstyled li {
+        padding: 0.25rem 0;
+    }
+</style>
+{% endblock %}

@@ -31,4 +31,20 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
 
+    def is_seller(self):
+        """Vérifie si l'utilisateur est un vendeur"""
+        return self.role == 'seller'
+
+    def is_client(self):
+        """Vérifie si l'utilisateur est un client"""
+        return self.role == 'client'
+
+    def is_admin(self):
+        """Vérifie si l'utilisateur est un admin"""
+        return self.role == 'admin'
+
+    def can_order(self):
+        """Vérifie si l'utilisateur peut passer des commandes"""
+        return not self.is_seller()
+
 # Create your models here.

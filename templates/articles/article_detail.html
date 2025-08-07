@@ -80,10 +80,21 @@
 
                     <!-- Actions -->
                     <div class="d-grid gap-2">
-                        <a href="{% url 'orders:order_article' article.id %}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-shopping-cart"></i>
-                            Commander cet article
-                        </a>
+                        {% if user.is_authenticated and user.role == 'seller' %}
+                            <!-- Message pour les vendeurs -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Vous êtes vendeur</strong><br>
+                                Vous ne pouvez pas passer de commandes. Gérez vos articles et commandes depuis votre
+                                <a href="{% url 'seller_dashboard' %}" class="alert-link">tableau de bord vendeur</a>.
+                            </div>
+                        {% else %}
+                            <!-- Boutons pour les clients et visiteurs -->
+                            <a href="{% url 'orders:order_article' article.id %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-cart"></i>
+                                Commander cet article
+                            </a>
+                        {% endif %}
 
                         {% if article.whatsapp_link %}
                             <a href="{{ article.whatsapp_link }}" target="_blank"

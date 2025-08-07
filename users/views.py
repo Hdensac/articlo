@@ -57,7 +57,7 @@ def profile_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Votre profil a été mis à jour avec succès !')
-            return redirect('profile')
+            return redirect('users:profile')
     else:
         form = UserProfileForm(instance=request.user)
 

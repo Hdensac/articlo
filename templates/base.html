@@ -70,7 +70,7 @@
                             <a class="nav-link" href="{% url 'seller_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard vendeur</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-success text-white ms-2" href="{% url 'edit_article' 0 %}"><i class="fas fa-plus"></i> Publier un article</a>
+                            <a class="nav-link btn btn-success text-white ms-2" href="{% url 'articles:create' %}"><i class="fas fa-plus"></i> Publier un article</a>
                         </li>
                     {% endif %}
                     {% if user.is_authenticated and user.role == 'admin' %}
@@ -88,11 +88,11 @@
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                                 <span style="font-size:1.2em;">👤</span>
                                 <span class="ms-1">{{ user.first_name|default:user.username }}</span>
-                                {% if user.role == 'seller' %}
+                                <!-- {% if user.role == 'seller' %}
                                     <span class="badge bg-warning text-dark ms-1">Vendeur</span>
                                 {% elif user.role == 'admin' %}
                                     <span class="badge bg-danger ms-1">Admin</span>
-                                {% endif %}
+                                {% endif %} -->
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="fas fa-user"></i> Mon Profil</a></li>

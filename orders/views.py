@@ -5,10 +5,17 @@ from django.http import Http404
 from articles.models import Article
 from notifications.models import Notification
 from users.models import User
+from users.decorators import not_seller_required
 from .models import Order
 from .forms import OrderForm, OrderStatusForm
 
 
+def seller_restriction_view(request):
+    """Vue pour informer les vendeurs qu'ils ne peuvent pas passer de commandes"""
+    return render(request, 'orders/seller_restriction.html')
+
+
+@not_seller_required
 def order_article(request, article_id):
     """Vue pour commander un article"""
     article = get_object_or_404(Article, id=article_id)
@@ -41,6 +48,7 @@ def order_article(request, article_id):
     return render(request, 'orders/order_form.html', context)
 
 
+@not_seller_required
 def order_success(request, order_id):
     """Page de confirmation de commande"""
     order = get_object_or_404(Order, id=order_id)
