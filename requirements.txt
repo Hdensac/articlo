@@ -10,6 +10,10 @@ psycopg2-binary>=2.9
 whitenoise>=6.0
 Pillow>=10.0
 
+# Stockage cloud pour les images (recommandé pour Render)
+django-storages>=1.14
+boto3>=1.26
+
 # Variables d'environnement
 python-decouple>=3.8
 dj-database-url>=2.0

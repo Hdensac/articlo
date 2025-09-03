@@ -62,9 +62,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Accueil</a>
-                    </li>
+                    {% if not user.is_authenticated or user.role != 'seller' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Accueil</a>
+                        </li>
+                    {% endif %}
                     {% if user.is_authenticated and user.role == 'seller' %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'seller_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard vendeur</a>
@@ -96,12 +98,6 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="fas fa-user"></i> Mon Profil</a></li>
-                                {% if user.role == 'seller' %}
-                                    <li><a class="dropdown-item" href="{% url 'seller_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Mon Dashboard</a></li>
-                                {% endif %}
-                                {% if user.is_staff %}
-                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="fas fa-cog"></i> Administration</a></li>
-                                {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
                             </ul>

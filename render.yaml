@@ -42,6 +42,17 @@ services:
       - key: MEDIA_ROOT
         value: "media"
       
+      # Configuration AWS S3 pour les images (optionnel)
+      # Décommentez et configurez ces variables si vous voulez utiliser AWS S3
+      # - key: AWS_ACCESS_KEY_ID
+      #   value: "votre_clé_access_aws"
+      # - key: AWS_SECRET_ACCESS_KEY
+      #   value: "votre_clé_secrète_aws"
+      # - key: AWS_STORAGE_BUCKET_NAME
+      #   value: "votre_bucket_s3"
+      # - key: AWS_S3_REGION_NAME
+      #   value: "us-east-1"
+      
       # Email Configuration (optionnel - à configurer plus tard)
       - key: EMAIL_BACKEND
         value: "django.core.mail.backends.console.EmailBackend"

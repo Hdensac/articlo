@@ -44,6 +44,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.middleware.MediaFilesMiddleware',  # Middleware pour les fichiers média
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -111,6 +112,49 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Media files (uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configuration pour servir les fichiers média en production
+if not DEBUG:
+    # Utiliser WhiteNoise pour les fichiers statiques
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # Configuration pour les fichiers média
+    # Note: Les fichiers média seront servis via les URLs Django
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_AUTOREFRESH = True
+    
+    # Alternative: Utiliser un service de stockage cloud (recommandé pour Render)
+    # Décommentez les lignes suivantes si vous voulez utiliser AWS S3 ou similaire
+    # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    # AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    # AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    # AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    # AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+    # AWS_DEFAULT_ACL = 'public-read'
+    # AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    # MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    
+    # Solution temporaire: Utiliser un dossier dans STATIC_ROOT pour les images
+    # Cela permet de servir les images via WhiteNoise
+    MEDIA_ROOT = STATIC_ROOT / 'media'
+    MEDIA_URL = '/static/media/'
+    
+    # Configuration AWS S3 pour les fichiers média (ACTIVER CETTE SECTION)
+    # Remplacer par vos vraies clés AWS
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+    
+    if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_STORAGE_BUCKET_NAME:
+        # Utiliser AWS S3 pour les fichiers média
+        DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+        print("✅ Configuration AWS S3 activée pour les fichiers média")
+    else:
+        print("⚠️ Configuration AWS S3 non trouvée, utilisation du stockage local temporaire")
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
