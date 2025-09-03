@@ -35,6 +35,24 @@ INSTALLED_APPS = [
     'notifications',
 ]
 
+# Activer Cloudinary si la variable est configurée
+if os.environ.get('CLOUDINARY_URL'):
+    INSTALLED_APPS += [
+        'cloudinary',
+        'cloudinary_storage',
+    ]
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    # Optionnel: configuration explicite (la variable CLOUDINARY_URL suffit normalement)
+    # CLOUDINARY_STORAGE = {
+    #     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    #     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    #     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    # }
+    try:
+        print("✅ Cloudinary détecté via CLOUDINARY_URL — backend activé: cloudinary_storage.storage.MediaCloudinaryStorage")
+    except Exception:
+        pass
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -119,28 +137,13 @@ if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     
     # Configuration pour les fichiers média
-    # Note: Les fichiers média seront servis via les URLs Django
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
     
-    # Alternative: Utiliser un service de stockage cloud (recommandé pour Render)
-    # Décommentez les lignes suivantes si vous voulez utiliser AWS S3 ou similaire
-    # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    # AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    # AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    # AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-    # AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
-    # AWS_DEFAULT_ACL = 'public-read'
-    # AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    # MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    # SOLUTION IMMÉDIATE : Forcer l'utilisation d'AWS S3 ou d'un service cloud
+    # Si AWS S3 n'est pas configuré, utiliser Cloudinary (gratuit)
     
-    # Solution temporaire: Utiliser un dossier dans STATIC_ROOT pour les images
-    # Cela permet de servir les images via WhiteNoise
-    MEDIA_ROOT = STATIC_ROOT / 'media'
-    MEDIA_URL = '/static/media/'
-    
-    # Configuration AWS S3 pour les fichiers média (ACTIVER CETTE SECTION)
-    # Remplacer par vos vraies clés AWS
+    # Vérifier d'abord AWS S3
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
@@ -154,7 +157,18 @@ if not DEBUG:
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
         print("✅ Configuration AWS S3 activée pour les fichiers média")
     else:
-        print("⚠️ Configuration AWS S3 non trouvée, utilisation du stockage local temporaire")
+        # Solution de secours : Utiliser Cloudinary (gratuit)
+        CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
+        if CLOUDINARY_URL:
+            DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+            print("✅ Configuration Cloudinary activée pour les fichiers média")
+        else:
+            # DERNIÈRE SOLUTION : Copier les images dans staticfiles
+            # ATTENTION : Cette solution perd les images à chaque redémarrage
+            MEDIA_ROOT = STATIC_ROOT / 'media'
+            MEDIA_URL = '/static/media/'
+            print("⚠️ ATTENTION : Utilisation du stockage local temporaire - les images seront perdues à chaque redémarrage")
+            print("💡 Pour une solution permanente, configurez AWS S3 ou Cloudinary")
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

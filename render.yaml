@@ -53,6 +53,12 @@ services:
       # - key: AWS_S3_REGION_NAME
       #   value: "us-east-1"
       
+      # Configuration Cloudinary pour les images (ALTERNATIVE GRATUITE)
+      # Décommentez et configurez cette variable pour une solution gratuite
+      # - key: CLOUDINARY_URL
+      #   value: "cloudinary://API_KEY:API_SECRET@CLOUD_NAME"
+      #   description: "Solution gratuite jusqu'à 25GB - pas de carte bancaire requise"
+      
       # Email Configuration (optionnel - à configurer plus tard)
       - key: EMAIL_BACKEND
         value: "django.core.mail.backends.console.EmailBackend"

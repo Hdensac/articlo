@@ -14,6 +14,9 @@ Pillow>=10.0
 django-storages>=1.14
 boto3>=1.26
 
+# Alternative gratuite : Cloudinary
+django-cloudinary-storage>=0.3.0
+
 # Variables d'environnement
 python-decouple>=3.8
 dj-database-url>=2.0
